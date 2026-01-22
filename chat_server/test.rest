@@ -1,2 +1,40 @@
 
-GET http://localhost:6688/api/chat
+
+
+POST http://localhost:6688/api/signup
+Content-Type: application/json
+
+{
+    "fullname": "linyz",
+    "email": "linyz2024@shanghaitech.edu.cn",
+    "password": "123456"
+}
+
+
+###
+POST http://localhost:6688/api/signin
+Content-Type: application/json
+
+{
+    "email": "linyz2024@shanghaitech.edu.cn",
+    "password": "123456"
+}
+
+###
+POST http://localhost:6688/api/signup
+Content-Type: application/json
+
+{
+    "fullname": "uu",
+    "email": "btou666@gmail.com",
+    "password": "123456"
+}
+
+###
+POST http://localhost:6688/api/signin
+Content-Type: application/json
+
+{
+    "email": "btou666@gmail.com",
+    "password": "123456"
+}

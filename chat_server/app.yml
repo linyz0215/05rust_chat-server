@@ -1,2 +1,12 @@
 server:
   port: 6688
+  db_url: "postgres://linyz@localhost/chat"
+auth:
+  sk: |
+    -----BEGIN PRIVATE KEY-----
+    MC4CAQAwBQYDK2VwBCIEIGeU/u/rS3i11z6/t+8vcUG2HbWV9T10DRTSgdWcmATw
+    -----END PRIVATE KEY-----
+  pk: |
+    -----BEGIN PUBLIC KEY-----
+    MCowBQYDK2VwAyEAuwc8+Mh1h2XcCeP1VCMUuT90nYkoNRRZ+O9FxBM1PLg=
+    -----END PUBLIC KEY-----
