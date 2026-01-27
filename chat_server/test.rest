@@ -30,6 +30,7 @@ Content-Type: application/json
 }
 
 ###
+
 POST http://localhost:6688/api/signin
 Content-Type: application/json
 
@@ -38,8 +39,10 @@ Content-Type: application/json
     "password": "123456"
 }
 
+//@token = {{signin.response.body.token}}
+
 
 ###
 
 GET http://localhost:6688/api/chat
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3Njk0MTc5MTgsImV4cCI6MTc3MDAyMjcxOCwibmJmIjoxNzY5NDE3OTE4LCJpc3MiOiJjaGF0X3NlcnZlciIsImF1ZCI6ImNoYXRfd2ViIiwiaWQiOjIsImZ1bGxuYW1lIjoidXUiLCJlbWFpbCI6ImJ0b3U2NjZAZ21haWwuY29tIiwiY3JlYXRlZF9hdCI6IjIwMjYtMDEtMjJUMTA6Mzk6MzMuMjkzNjY3WiJ9.og4drob5gC5Pp2myo620RKb9DcNgVuyVyxOkbFgkaQgNDur4t5t_IAolnc4HW2uhatSGa7FFUaN6wbcTkvSeCQ

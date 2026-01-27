@@ -5,10 +5,6 @@ use axum_extra::{TypedHeader, headers};
 use futures::{Stream, stream};
 use tokio_stream::StreamExt;
 
-
-
-
-
 pub(crate) async fn sse_handler(
     TypedHeader(user_agent): TypedHeader<headers::UserAgent>,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {

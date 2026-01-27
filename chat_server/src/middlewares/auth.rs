@@ -12,7 +12,6 @@ use tracing::warn;
 
 use crate::AppState;
 
-use super::*;
 
 pub async fn verify_token(State(state): State<AppState>, req: Request, next: Next) -> Response {
     let (mut parts, body) = req.into_parts();
@@ -29,7 +28,7 @@ pub async fn verify_token(State(state): State<AppState>, req: Request, next: Nex
                     Err(e) => {
                         let msg = format!("Verify token failed: {}", e);
                         warn!(msg);
-                        return (StatusCode::UNAUTHORIZED, msg).into_response();
+                        return (StatusCode::FORBIDDEN, msg).into_response();
                     }
                 }
             }
@@ -40,4 +39,43 @@ pub async fn verify_token(State(state): State<AppState>, req: Request, next: Nex
             }
         };
         next.run(req).await
+}
+
+
+#[cfg(test)]
+mod tests {
+    use crate::{AppConfig, User};
+
+    use super::*;
+    use anyhow::Result;
+    use axum::{body::Body, middleware::from_fn_with_state, routing::get, Router};
+    use tower::ServiceExt;
+    async fn handler(req: Request) -> impl IntoResponse {
+        (StatusCode::OK, "ok")
+    }
+
+    #[tokio::test]
+    async fn verify_token_middleware_should_work() -> Result<()> {
+        let config = AppConfig::load()?;
+        let (_tdb, state) = AppState::try_new_test(config).await?;
+        let user = User::new(1, "linyz", "linyz2024@shanghaitech.edu.cn");
+        let token = state.ek.sign(user)?;
+        let app: Router = Router::new()
+            .route("/test", get(handler))
+            .layer(from_fn_with_state(state.clone(), verify_token))
+            .with_state(state);
+        
+        let req = Request::builder().uri("/test").header("Authorization", format!("Bearer {}",token)).body(Body::empty())?;
+        let res = app.clone().oneshot(req).await?;
+        assert_eq!(res.status(), StatusCode::OK);
+
+        let req = Request::builder().uri("/test").body(Body::empty())?;
+        let res = app.clone().oneshot(req).await?;
+        assert_eq!(res.status(), StatusCode::UNAUTHORIZED);
+
+        let req = Request::builder().uri("/test").header("Authorization", "Bearer token").body(Body::empty())?;
+        let res = app.clone().oneshot(req).await?;
+        assert_eq!(res.status(), StatusCode::FORBIDDEN);
+        Ok(())
+    }
 }

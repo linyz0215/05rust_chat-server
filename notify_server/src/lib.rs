@@ -1,5 +1,4 @@
 use axum:: {
-    response::sse::{Event, Sse},
     routing::get,
     Router,
 };
