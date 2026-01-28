@@ -1,15 +1,21 @@
 
 
-
+###
+# @name signup
 POST http://localhost:6688/api/signup
 Content-Type: application/json
 
 {
+    "workspace": "chat",
     "fullname": "linyz",
     "email": "linyz2024@shanghaitech.edu.cn",
     "password": "123456"
-} 
+}
 
+
+###
+
+# 
 POST http://localhost:6688/api/signin 
 Content-Type: application/json
 
@@ -24,12 +30,16 @@ POST http://localhost:6688/api/signup
 Content-Type: application/json
 
 {
+    "workspace": "chat",
     "fullname": "uu",
     "email": "btou666@gmail.com",
     "password": "123456"
 }
 
 ###
+
+
+# @name signin
 POST http://localhost:6688/api/signin
 Content-Type: application/json
 
@@ -38,8 +48,45 @@ Content-Type: application/json
     "password": "123456"
 }
 
+@token = {{signin.response.body.token}}
+
+###
+GET http://localhost:6688/api/chat
+Authorization: Bearer 
 
 ###
 
-GET http://localhost:6688/api/chat
-Authorization: Bearer 
+# @name signin
+POST http://localhost:6688/api/signin
+Content-Type: application/json
+
+{
+    "email": "btou666@gmail.com",
+    "password": "123456"
+}
+
+###
+Post http://localhost:6688/api/signup
+Content-Type: application/json
+
+{
+    "workspace": "chat1",
+    "fullname": "linyz2",
+    "email": "linyz2@shanghaitech.edu.cn",
+    "password": "123456"
+}
+
+###
+# @name token1
+POST http://localhost:6688/api/signin
+Content-Type: application/json
+
+{
+    "email": "linyz2@shanghaitech.edu.cn",
+    "password": "123456"
+}
+
+###
+
+GET http://localhost:6688/api/users
+Authorization: Bearer {{token1.response.body.token}}

@@ -49,7 +49,7 @@ mod tests {
     async fn signup_should_work() -> Result<()> {
         let config = AppConfig::load()?;
         let (_tdb, state) = AppState::try_new_test(config).await?;
-        let input = CreateUser::new("linyz", "linyz2024@shanghaitech.edu.cn", "123456");
+        let input = CreateUser::new("none","linyz", "linyz2024@shanghaitech.edu.cn", "123456");
         let ret = signup_handler(State(state), Json(input))
             .await?.into_response();
         assert_eq!(ret.status(), StatusCode::CREATED);
@@ -64,7 +64,7 @@ mod tests {
     async fn signup_duplicate_user_should_409() -> Result<()> {
         let config = AppConfig::load()?;
         let (_tdb, state) = AppState::try_new_test(config).await?;
-        let input: CreateUser = CreateUser::new("linyz", "linyz2024@shanghaitech.edu.cn", "123456");
+        let input: CreateUser = CreateUser::new("none","linyz", "linyz2024@shanghaitech.edu.cn", "123456");
         signup_handler(State(state.clone()), Json(input.clone())).await?;
         let ret = signup_handler(State(state.clone()), Json(input.clone()))
             .await
@@ -73,7 +73,7 @@ mod tests {
         let body = ret.into_body().collect().await?.to_bytes();
         let ret: ErrorOutput = serde_json::from_slice(&body)?;
 
-        assert_eq!(ret.error, "email already exists");
+        assert_eq!(ret.error, "email already exists: linyz2024@shanghaitech.edu.cn");
         Ok(())
     }
 
@@ -84,7 +84,7 @@ mod tests {
         let name = "linyz";
         let email = "linyz2024@shanghaitech.edu.cn";
         let password = "123456";
-        let user = CreateUser::new(name, email, password);
+        let user = CreateUser::new("none",name, email, password);
         User::create(&user, &state.pool).await?;
         let input = SigninUser::new(email, password);
         let ret = signin_handler(State(state), Json(input))
