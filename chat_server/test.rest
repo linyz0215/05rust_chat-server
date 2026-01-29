@@ -15,7 +15,7 @@ Content-Type: application/json
 
 ###
 
-# 
+# @name signin
 POST http://localhost:6688/api/signin 
 Content-Type: application/json
 
@@ -26,6 +26,7 @@ Content-Type: application/json
 
 
 ###
+# @name signup
 POST http://localhost:6688/api/signup
 Content-Type: application/json
 
@@ -48,7 +49,7 @@ Content-Type: application/json
     "password": "123456"
 }
 
-@token = {{signin.response.body.token}}
+
 
 ###
 GET http://localhost:6688/api/chat
@@ -71,8 +72,8 @@ Content-Type: application/json
 
 {
     "workspace": "chat1",
-    "fullname": "linyz2",
-    "email": "linyz2@shanghaitech.edu.cn",
+    "fullname": "tom",
+    "email": "tom@shanghaitech.edu.cn",
     "password": "123456"
 }
 
@@ -82,11 +83,64 @@ POST http://localhost:6688/api/signin
 Content-Type: application/json
 
 {
-    "email": "linyz2@shanghaitech.edu.cn",
+    "email": "tom@shanghaitech.edu.cn",
     "password": "123456"
 }
 
 ###
 
 GET http://localhost:6688/api/users
-Authorization: Bearer {{token1.response.body.token}}
+Authorization: Bearer {{signin.response.body.token}}
+
+###
+POST http://localhost:6688/api/chats
+Content-Type: application/json
+Authorization: Bearer {{signin.response.body.token}}
+
+{
+    "name": "chat",
+    "members": [1,2],
+    "public": true
+}
+
+###
+GET http://localhost:6688/api/chats
+Content-Type: application/json
+Authorization: Bearer {{signin.response.body.token}}
+###
+GET http://localhost:6688/api/chats/4
+Content-Type: application/json
+Authorization: Bearer {{signin.response.body.token}}
+
+###
+# @name signup
+POST http://localhost:6688/api/signup
+Content-Type: application/json
+
+{
+    "workspace": "chat1",
+    "fullname": "alice",
+    "email": "alice@shanghaitech.edu.cn",
+    "password": "123456"
+}
+
+###
+# @name signin
+POST http://localhost:6688/api/signin 
+Content-Type: application/json
+
+{
+    "email": "alice@shanghaitech.edu.cn",
+    "password": "123456"
+}
+
+###
+POST http://localhost:6688/api/chats
+Content-Type: application/json
+Authorization: Bearer {{signin.response.body.token}}
+
+{
+    "name": "chat_alice_tom",
+    "members": [3,4],
+    "public": true
+}

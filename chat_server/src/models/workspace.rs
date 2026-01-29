@@ -92,7 +92,7 @@ impl Workspace {
 mod tests {
     use std::path::Path;
 
-    use crate::models::CreateUser;
+    use crate::{models::CreateUser, test_util::get_test_pool};
 
     use super::*;
     use anyhow::Result;
@@ -100,17 +100,15 @@ mod tests {
 
     #[tokio::test]
     async fn workspace_should_create_and_set_owner() -> Result<()> {
-        let tdb = TestPg::new(
-            "postgres://linyz@localhost/chat".to_string(),
-            Path::new("../migrations"),
-        );
-        let pool = tdb.get_pool().await;
-        let ws = Workspace::create("test", 0, &pool).await.unwrap();
+        let server_url = "postgres://linyz@localhost/chat";
+        let (_tdb,pool) = get_test_pool(Some(server_url)).await;
 
-        let input = CreateUser::new(&ws.name, "linyz", "linyz2024@shanghaitech.edu.cn", "123456");
+        let ws = Workspace::create("test1", 0, &pool).await.unwrap();
+
+        let input = CreateUser::new(&ws.name, "linyz1", "linyz12024@shanghaitech.edu.cn", "123456");
         let user = User::create(&input, &pool).await.unwrap();
 
-        assert_eq!(ws.name, "test");
+        assert_eq!(ws.name, "test1");
 
         assert_eq!(user.ws_id, ws.id);
 
@@ -122,36 +120,22 @@ mod tests {
 
      #[tokio::test]
     async fn workspace_should_find_by_name() -> Result<()> {
-        let tdb = TestPg::new(
-            "postgres://linyz@localhost/chat".to_string(),
-            Path::new("../migrations"),
-        );
-        let pool = tdb.get_pool().await;
-        let _ws = Workspace::create("test", 0, &pool).await?;
-        let ws = Workspace::find_by_name("test", &pool).await?;
+        let server_url = "postgres://linyz@localhost/chat";
+        let (_tdb,pool) = get_test_pool(Some(server_url)).await; 
+        let ws = Workspace::find_by_name("foo", &pool).await?;
 
-        assert_eq!(ws.unwrap().name, "test");
+        assert_eq!(ws.unwrap().name, "foo");
         Ok(())
     }
 
     #[tokio::test]
     async fn workspace_should_fetch_all_chat_users() -> Result<()> {
-        let tdb = TestPg::new(
-            "postgres://linyz@localhost/chat".to_string(),
-            Path::new("../migrations"),
-        );
-        let pool = tdb.get_pool().await;
-        let ws = Workspace::create("test", 0, &pool).await?;
-        let input = CreateUser::new(&ws.name, "linyz", "linyz2024@shanghaitech.edu.cn", "123456");
-        let user1 = User::create(&input, &pool).await?;
-        let input = CreateUser::new(&ws.name, "uu", "xxxx", "123456");
-        let user2 = User::create(&input, &pool).await?;
+        let server_url = "postgres://linyz@localhost/chat";
+        let (_tdb,pool) = get_test_pool(Some(server_url)).await;
 
-        let users = Workspace::fetch_all_chat_users(ws.id as _, &pool).await?;
-        assert_eq!(users.len(), 2);
-        assert_eq!(users[0].id, user1.id);
-        assert_eq!(users[1].id, user2.id);
 
+        let users = Workspace::fetch_all_chat_users(1, &pool).await?;
+        assert_eq!(users.len(), 5);
         Ok(())
     }
 

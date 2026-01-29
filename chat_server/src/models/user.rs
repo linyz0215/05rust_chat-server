@@ -3,8 +3,7 @@ use std::mem;
 use argon2::{Argon2, PasswordHash, PasswordHasher as _, PasswordVerifier as _, password_hash::{SaltString, rand_core::OsRng}};
 use serde::Deserialize;
 use sqlx::{PgPool};
-use crate::{AppError, User, models::Workspace};
-use crate::models::ChatUser;
+use crate::{AppError, User, models::{ChatUser, Workspace}};
 #[derive(Deserialize,Clone)]
 pub struct CreateUser {
     pub fullname: String,
@@ -93,7 +92,33 @@ impl User {
 }
 
 impl ChatUser {
+    pub async fn fetch_all(ws_id: u64, pool: &PgPool) -> Result<Vec<Self>, AppError> {
+        let users = sqlx::query_as(
+            r#"
+            SELECT id, fullname, email
+            FROM users
+            WHERE ws_id = $1
+            "#,
+        )
+        .bind(ws_id as i64)
+        .fetch_all(pool)
+        .await?;
+        Ok(users)
+    }
 
+    pub async fn fetch_by_ids(ids: &[i64], pool: &PgPool) -> Result<Vec<Self>, AppError> {
+        let users = sqlx::query_as(
+            r#"
+            SELECT id, fullname, email
+            FROM users
+            WHERE id = ANY($1)
+            "#,
+        )
+        .bind(ids)
+        .fetch_all(pool)
+        .await?;
+        Ok(users)
+    }
 }
 
 fn hash_password(password: &str) -> Result<String, AppError> {
@@ -173,10 +198,9 @@ impl User {
 
 #[cfg(test)]
 mod tests{
-    use std::path::Path;
-
-    use sqlx_db_tester::TestPg;
     use anyhow::Result;
+    use crate::test_util::get_test_pool;
+
     use super::*;
     
     #[test]
@@ -191,12 +215,9 @@ mod tests{
 
     #[tokio::test]
     async fn create_user_should_work() -> Result<()> {
-        let tdb = TestPg::new(
-            "postgres://linyz@localhost/chat".to_string(),
-            Path::new("../migrations"),
-        );
-        let pool = tdb.get_pool().await;
-        let input = CreateUser::new("lll","linyz", "linyz2024@shanghaitech.edu.cn", "123456");
+        let server_url = "postgres://linyz@localhost/chat";
+        let (_tdb,pool) = get_test_pool(Some(server_url)).await;
+        let input = CreateUser::new("lll","linyz1", "linyz12024@shanghaitech.edu.cn", "123456");
         let user = User::create(&input, &pool).await?;
         assert_eq!(user.email, input.email);
         assert_eq!(user.fullname, input.fullname);
