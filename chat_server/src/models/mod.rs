@@ -1,6 +1,7 @@
 mod user;
 mod workspace;
 mod chat;
+mod file;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
@@ -48,4 +49,10 @@ pub struct Chat {
     pub r#type: ChatType,
     pub members: Vec<i64>,
     pub created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+pub struct ChatFile {
+    pub ext: String,
+    pub hash: String,
 }

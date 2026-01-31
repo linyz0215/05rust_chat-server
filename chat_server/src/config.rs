@@ -1,4 +1,4 @@
-use std::{env, fs::File};
+use std::{env, fs::File, path::PathBuf};
 
 use serde::{Serialize, Deserialize};
 use anyhow::{Result, bail};
@@ -11,11 +11,12 @@ pub struct AppConfig {
 pub struct ServerConfig {
     pub port: u16,
     pub db_url: String,
+    pub base_dir: PathBuf,
 }
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AuthConfig {
     pub sk: String,
-    pub pk: String,
+    pub pk: String, 
 }
 
 impl AppConfig {

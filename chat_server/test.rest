@@ -144,3 +144,24 @@ Authorization: Bearer {{signin.response.body.token}}
     "members": [3,4],
     "public": true
 }
+
+
+### upload
+POST http://localhost:6688/api/upload
+Authorization: Bearer {{signin.response.body.token}}
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; filename="cats.png"
+Content-Type: application/octet-stream
+
+< /Users/linyz/snapshot/cats.png
+--MyBoundary
+Content-Disposition: form-data; filename="hello.txt"
+
+Hello, world!
+--MyBoundary--
+
+###
+GET http://localhost:6688/api/files/1/116/544/8a23b0408bf7df190550192193988d592e.png
+Authorization: Bearer {{signin.response.body.token}}
