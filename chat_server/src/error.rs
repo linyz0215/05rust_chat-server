@@ -10,14 +10,14 @@ pub struct ErrorOutput {
 }
 #[derive(Error, Debug)]
 pub enum AppError {
+    #[error("message create error: {0}")]
+    CreateMessageError(String),
     #[error("sqlx error: {0}")]
     SqlxError(#[from] sqlx::Error),
     #[error("password hash error: {0}")]
     PasswordHashError(#[from] argon2::password_hash::Error),
-
     #[error("jwt error: {0}")]
     JwtError(#[from] jwt_simple::Error),
-
     #[error("http header parse error: {0}")]
     HttpHeaderError(#[from] axum::http::header::InvalidHeaderValue),
     #[error("email already exists: {0}")]
@@ -26,10 +26,11 @@ pub enum AppError {
     CreateChatError(String),
     #[error("Not found: {0}")]
     NotFound(String),
-
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
 
+    #[error("chat file error: {0}")]
+    ChatFileError(String),
 }
 
 impl ErrorOutput {
@@ -51,6 +52,8 @@ impl IntoResponse for AppError {
             Self::CreateChatError(_) => StatusCode::BAD_REQUEST,
             Self::NotFound(_) => StatusCode::NOT_FOUND,
             Self::IoError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::CreateMessageError(_) => StatusCode::BAD_REQUEST,
+            Self::ChatFileError(_) => StatusCode::BAD_REQUEST,
         };
         (status, Json(serde_json::json!({"error": self.to_string()}))).into_response()
     }

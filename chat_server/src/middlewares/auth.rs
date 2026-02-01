@@ -12,7 +12,6 @@ use tracing::warn;
 
 use crate::AppState;
 
-use super::*;
 
 pub async fn verify_token(State(state): State<AppState>, req: Request, next: Next) -> Response {
     let (mut parts, body) = req.into_parts();

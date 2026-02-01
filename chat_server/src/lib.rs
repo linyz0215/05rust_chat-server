@@ -8,7 +8,7 @@ use anyhow::Context;
 use axum::{
     Router,
     middleware::from_fn_with_state,
-    routing::{get, patch, post},
+    routing::{get, post},
 };
 use tokio::fs;
 pub use config::AppConfig;
@@ -26,8 +26,7 @@ use crate::{
     middlewares::verify_token,
     utils::{DecodingKey, EncodingKey},
 };
-#[cfg(test)]
-use sqlx_db_tester::TestPg;
+
 
 #[derive(Debug, Clone)]
 pub(crate) struct AppState {
@@ -114,7 +113,8 @@ mod test_util {
     use sqlx_db_tester::TestPg;
     use sqlx::Executor;
     impl AppState {
-        pub async fn try_new_test(config: AppConfig) -> Result<(TestPg, Self), AppError> {
+        pub async fn try_new_test() -> Result<(TestPg, Self), AppError> {
+            let config = AppConfig::load()?;
             let ek = EncodingKey::load(&config.auth.sk).context("load sk failed")?;
             let dk = DecodingKey::load(&config.auth.pk).context("load pk failed")?;
             let server_url = &config.server.db_url;

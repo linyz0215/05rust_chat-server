@@ -1,15 +1,13 @@
 use axum::extract::Path;
 
-use axum_extra::headers::Header;
 use hyper::HeaderMap;
-use tokio::fs::{self, File};
+use tokio::fs::{self};
 
 use axum::{
     Extension, Json,
     extract::{Multipart, State},
     response::IntoResponse,
 };
-use tokio_util::io::ReaderStream;
 use tracing::warn;
 
 use crate::{AppError, AppState, ChatFile, User};
@@ -50,15 +48,15 @@ pub(crate) async fn upload_handler(
     mut multipart: Multipart,
 ) -> Result<impl IntoResponse, AppError> {
     let ws_id = user.ws_id as u64;
-    let base_dir = &state.config.server.base_dir.join(ws_id.to_string());
+    let base_dir = &state.config.server.base_dir;
     let mut files = vec![];
-    while let Some(mut field) = multipart.next_field().await.unwrap() {
+    while let Some(field) = multipart.next_field().await.unwrap() {
         let filename = field.file_name().map(|name| name.to_string());
         let (Some(filename), Ok(data)) = (filename, field.bytes().await) else {
             warn!("Failed to read multipart field ",);
             continue;
         };
-        let file = ChatFile::new(&filename, &data);
+        let file = ChatFile::new(ws_id, &filename, &data);
         let path = file.path(&base_dir);
         if path.exists() {
             warn!("File {} already exists: {:?}", filename, path);
@@ -66,7 +64,7 @@ pub(crate) async fn upload_handler(
             fs::create_dir_all(path.parent().expect("file path should exists")).await?;
             fs::write(path, data).await?;
         }
-        files.push(file.url(ws_id));
+        files.push(file.url());
     }
     Ok(Json(files))
 }

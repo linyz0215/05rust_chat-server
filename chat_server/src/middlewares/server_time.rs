@@ -10,6 +10,7 @@ use tokio::time::Instant;
 use tower::{Layer, Service};
 use tracing::warn;
 
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct ServerTimeLayer;
 
