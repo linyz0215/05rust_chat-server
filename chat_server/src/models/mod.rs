@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 pub use user::{CreateUser, SigninUser};
 pub use chat::CreateChat;
+pub use message::{CreateMessage, ListMessages};
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow, PartialEq)]
 pub struct User {
     pub id: i64,

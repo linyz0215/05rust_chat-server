@@ -165,3 +165,18 @@ Hello, world!
 ###
 GET http://localhost:6688/api/files/1/116/544/8a23b0408bf7df190550192193988d592e.png
 Authorization: Bearer {{signin.response.body.token}}
+
+
+###
+POST http://localhost:6688/api/chats/1
+Content-Type: application/json
+Authorization: Bearer {{signin.response.body.token}}
+
+{
+    "content": "hello, uu",
+    "files": []
+}
+###
+
+GET http://localhost:6688/api/chats/1/messages?limit=6&last_id=5
+Authorization: Bearer {{signin.response.body.token}}

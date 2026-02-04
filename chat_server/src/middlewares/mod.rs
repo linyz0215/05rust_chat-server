@@ -1,5 +1,6 @@
 mod request_id;
 mod auth;
+mod chat; 
 mod server_time;
 mod server_time1;
 use crate::{ middlewares::{ server_time1::set_server_time}};
@@ -16,7 +17,7 @@ use tracing::Level;
 const REQUEST_ID_HEADER: &str = "x-request-id";
 const SERVER_TIME_HEADER: &str = "x-server-time";
 pub use auth::verify_token;
-
+pub use chat::verify_chat;
 pub fn set_layer(app: Router) -> Router {
     app.layer(
         ServiceBuilder::new()

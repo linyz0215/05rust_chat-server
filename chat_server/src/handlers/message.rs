@@ -1,6 +1,7 @@
-use axum::extract::Path;
+use axum::extract::{Path, Query};
 
 use hyper::HeaderMap;
+
 use tokio::fs::{self};
 
 use axum::{
@@ -10,14 +11,26 @@ use axum::{
 };
 use tracing::warn;
 
-use crate::{AppError, AppState, ChatFile, User};
+use crate::{AppError, AppState, ChatFile, CreateMessage, ListMessages, User};
 
-pub(crate) async fn send_message_handler() -> impl IntoResponse {
-    "send message"
+pub(crate) async fn send_message_handler(
+    Extension(user): Extension<User>,
+    State(state): State<AppState>,
+    Path(id): Path<u64>,
+    Json(input): Json<CreateMessage>,
+) -> Result<impl IntoResponse, AppError> {
+    let msg = state.create_message(input, id, user.id as _).await?;
+
+    Ok(Json(msg))
 }
 
-pub(crate) async fn list_messages_handler() -> impl IntoResponse {
-    "list messages"
+pub(crate) async fn list_messages_handler(
+    State(state): State<AppState>,
+    Path(id): Path<u64>,
+    Query(input): Query<ListMessages>,
+) -> Result<impl IntoResponse, AppError> {
+    let message = state.list_messages(input, id).await?;
+    Ok(Json(message))
 }
 
 pub(crate) async fn file_handler(

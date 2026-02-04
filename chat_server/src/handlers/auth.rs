@@ -16,7 +16,7 @@ pub(crate) async fn signup_handler(
 ) -> Result<impl IntoResponse, AppError> {
     let user = state.create_user(&input).await?;
     let token = state.ek.sign(user)?;
-    let body = Json(token );
+    let body = Json(token);
     Ok((StatusCode::CREATED, body))
 }
 
@@ -37,6 +37,15 @@ pub(crate) async fn signin_handler(
         }
     }
 }
+
+
+
+
+
+
+
+
+
 
 #[cfg(test)]
 mod tests {

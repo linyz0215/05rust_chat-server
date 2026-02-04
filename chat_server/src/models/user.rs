@@ -26,7 +26,15 @@ impl AppState {
             .await?;
         Ok(user)
     }
-
+    pub async fn find_user_by_id(&self, id: i64) -> Result<Option<User>, AppError> {
+        let user = sqlx::query_as(
+            "SELECT id, ws_id, fullname, email, created_at FROM users WHERE id = $1",
+        )
+        .bind(id)
+        .fetch_optional(&self.pool)
+        .await?;
+        Ok(user)
+    }
     pub async fn create_user(  
         &self,  
         input: &CreateUser,
@@ -58,9 +66,8 @@ impl AppState {
         .await?;
 
         if ws.owner_id == 0 {
-            ws.update_workspace_owner(user.id as _, &self.pool).await?;
+            self.update_workspace_owner(user.id as _, ws.id as _).await?;
         }
-
         Ok(user)
     }
 
